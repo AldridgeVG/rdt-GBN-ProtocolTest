@@ -3,28 +3,13 @@
 #include "GBNRdtSender.h"
 
 GBNRdtSender::GBNRdtSender(Configuration config) {
-	/*
-	Configuration::SEQNUM_BIT = 3;
-	Configuration::SEQNUM_MAX = 8;
-	Configuration::WINDOW_N = 4;
-
-	cout << "input bits of seqnum_max:" << endl;
-	cin >> Configuration::SEQNUM_BIT;
-	Configuration::SEQNUM_MAX = 1;
-	for (int i = 0; i < Configuration::SEQNUM_BIT; i++)	Configuration::SEQNUM_MAX *= 2;
-
-	cout << "sequence max: " << Configuration::SEQNUM_MAX << endl;
-	cout << "input window size" << endl;
-	cin >> Configuration::WINDOW_N;
-	cout << "window size: " << Configuration::WINDOW_N;
-	*/
-	expectSequenceNumberSend = 0;			// 下一个发送序号 
+	expectSequenceNumberSend = 0;			// 发送序号，初始为0最大为rmax-1
 	waitingState = false;									// 是否处于等待Ack的状态
-	pPacketWaitingAck = new Packet[config.SEQNUM_MAX];
-	windowN = config.WINDOW_N;	// 滑动窗口大小
-	base = 0;													// 当前窗口的序号的基址，由receive函数维护 
-	rMax = config.SEQNUM_MAX;		// 窗口序号上界，即最大序号为rMax-1
-	nowlMax = windowN;	 							// 滑动窗口右边界，最大为rMax，最小为1,由receive函数维护
+	pPacketWaitingAck = new Packet[config.SEQNUM_MAX];		//全部待发送分组
+	windowN = config.WINDOW_N;				// 滑动窗口大小
+	base = 0;													// 当前窗口的序号的基址
+	rMax = config.SEQNUM_MAX;					// 窗口序号上界，即最大序号为rMax-1（从0开始）
+	nowlMax = windowN;	 							// 滑动窗口右边界，最大为rMax，最小为1
 }
 
 GBNRdtSender::~GBNRdtSender() {
@@ -41,29 +26,29 @@ bool GBNRdtSender::getWaitingState() {
 bool GBNRdtSender::send(Message &message) {
 	if (waitingState)	//发送方处于等待确认状态
 		return false;
-	// 当前处理的分组
+	//初始化当前处理的分组（编号从0开始）
 	Packet *pPacketDel = &pPacketWaitingAck[expectSequenceNumberSend];
-	// 序号；下一个发送的序号，初始为0
+	//seq下一个发送的序号，初始为0，下一序号从1开始
 	pPacketDel->seqnum = expectSequenceNumberSend;
-	// 确认号
+	//ack确认号
 	pPacketDel->acknum = -1;	// 忽略该字段
-	// 校验和
+	//chksum校验和
 	pPacketDel->checksum = 0;
 
+	//将信息装入packet，计算校验和
 	memcpy(pPacketDel->payload, message.data, sizeof(message.data));
 	pPacketDel->checksum = pUtils->calculateCheckSum(*pPacketDel);
+
 	pUtils->printPacket("发送方 发送 原始报文", *pPacketDel);
 	// 窗口的第一个发送报文需要开启定时器，该计时器的编号是base
 	if (base == expectSequenceNumberSend) {
 		pns->startTimer(SENDER, Configuration::TIME_OUT, base);
-		// cout << endl;
 	}
 	//调用模拟网络环境的sendToNetworkLayer，通过网络层发送到对方
 	pns->sendToNetworkLayer(RECEIVER, *pPacketDel);
 	expectSequenceNumberSend++;
-	// 有可能会出现nowlMax == rMax，而expectSequenceNumberSend == rMax的情况
+	// 有可能会出现nowlMax=rMax而且expectSequenceNumberSend = rMax的情况，发送完毕
 	if (nowlMax == rMax && expectSequenceNumberSend == nowlMax) {
-
 	}
 	else
 		expectSequenceNumberSend %= rMax;
