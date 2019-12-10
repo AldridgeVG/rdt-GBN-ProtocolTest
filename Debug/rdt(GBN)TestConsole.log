@@ -1,0 +1,8 @@
+﻿  GBNRdtReceiver.cpp
+  GBNRdtSender.cpp
+  rdt(GBN)TestConsole.cpp
+GBNRdtReceiver.obj : error LNK2001: 无法解析的外部符号 "public: static int GBNRdtSender::SEQNUM_MAX" (?SEQNUM_MAX@GBNRdtSender@@2HA)
+GBNRdtSender.obj : error LNK2001: 无法解析的外部符号 "public: static int GBNRdtSender::SEQNUM_MAX" (?SEQNUM_MAX@GBNRdtSender@@2HA)
+GBNRdtSender.obj : error LNK2001: 无法解析的外部符号 "public: static int GBNRdtSender::SEQNUM_BIT" (?SEQNUM_BIT@GBNRdtSender@@2HA)
+GBNRdtSender.obj : error LNK2001: 无法解析的外部符号 "public: static int GBNRdtSender::WINDOW_N" (?WINDOW_N@GBNRdtSender@@2HA)
+C:\Users\caxus\Desktop\C++\rdt(GBN)TestConsole\Debug\rdt(GBN)TestConsole.exe : fatal error LNK1120: 3 个无法解析的外部命令
