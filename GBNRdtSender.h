@@ -16,20 +16,11 @@ private:
 	int nowlMax;					// 滑动窗口右边界，最大为rMax，最小为1
 
 public:
-	friend class GBNRdtReceiver;
-
-	//max seq bits and decimal max number
-	static int SEQNUM_BIT;
-	static int SEQNUM_MAX;
-
-	//size of window
-	static int WINDOW_N;
-
 	bool getWaitingState();
 	bool send(Message &message);
 	void receive(Packet &ackPkt);	//接受确认Ack，将被NetworkServiceSimulator调用	
 	void timeoutHandler(int seqNum);//Timeout handler，将被NetworkServiceSimulator调用
 
-	GBNRdtSender();
+	GBNRdtSender(Configuration config);
 	virtual ~GBNRdtSender();
 };

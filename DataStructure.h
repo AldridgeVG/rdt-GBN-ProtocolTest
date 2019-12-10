@@ -1,13 +1,28 @@
 #pragma once
 
-struct  Configuration {
+class  Configuration {
+public:
 	//byte size of payload
 	static const int PAYLOAD_SIZE = 21;
 
 	//timeout
 	static const int TIME_OUT = 20;
+
+	//max seq bits and decimal max number
+	int SEQNUM_BIT;
+	int SEQNUM_MAX;
+
+	//size of window
+	int WINDOW_N;
+
+	Configuration(int x, int y):SEQNUM_BIT(x),WINDOW_N(y) {	
+		SEQNUM_MAX = 1;
+		for (int i = 0; i < SEQNUM_BIT; i++) {
+			SEQNUM_MAX *= 2;
+		}
+	}
 };
- 
+
 struct  Message {
 	//appication layer message content
 	char data[Configuration::PAYLOAD_SIZE];

@@ -14,13 +14,32 @@ char signY = 'X';					// 全局变量pch.h中声明，用于SR协议描述该位
 char signN = ' ';					// 全局变量pch.h中声明，用于SR协议描述该位置缓存未被占用
 
 int main(void) {
+
 	char inputFileName[100] = "C:\\Users\\caxus\\Desktop\\input.txt";						// 需要传输的数据文件名
 	char outputFileNameGBN[100] = "C:\\Users\\caxus\\Desktop\\output.txt";				// 用该文件保存GBN协议收到的数据
 	char outputWindowGBN[100] = "C:\\Users\\caxus\\Desktop\\outputWindow.txt";			// 用该文件保存GBN协议窗口
 
-	RdtSender *ps = new GBNRdtSender();
-	RdtReceiver *pr = new GBNRdtReceiver();
+	//不实例化：采用static ->LNK2001， 采用static const->无法赋值
+	//实例化Configuration，实现对普通int变量SEQMAX和WINDOW的赋值
+	int seqb, wind;
+	cout << "input sequence number bits and size of window" << endl;
+	cin >> seqb;
+	cin >> wind;
+	Configuration config = Configuration(seqb, wind);
+	cout << "this is your seqmax and window size:" << endl;
+	cout << "SEQNUM MAX:" << config.SEQNUM_MAX << endl;
+	cout << "WINDOW SIZE:" << config.WINDOW_N << endl;
 
+	//初始化
+	cout << "initiating sender and reciever" << endl;
+	RdtSender *ps = new GBNRdtSender(config);
+	RdtReceiver *pr = new GBNRdtReceiver(config);
+	cout << "initiation complete" << endl;
+
+	cout << "transmission starting in 3s" << endl;
+	Sleep(3000);
+
+	//执行
 	pns->init();
 	pns->setRtdSender(ps);
 	pns->setRtdReceiver(pr);
@@ -29,6 +48,7 @@ int main(void) {
 	foutGBN.open(outputWindowGBN);
 	pns->start();
 
+	//关闭输出流
 	foutGBN.close();
 	system("pause");
 	delete ps;

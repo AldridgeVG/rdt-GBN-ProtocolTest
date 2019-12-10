@@ -2,14 +2,15 @@
 #include "pch.h"
 #include "Global.h"
 #include "GBNRdtReceiver.h"
-#include "GBNRdtSender.h"
 
 // 构造函数，初始化确认报文
-GBNRdtReceiver::GBNRdtReceiver() {
+GBNRdtReceiver::GBNRdtReceiver(Configuration config) {
 	expectSequenceNumberRcvd = 0;
+	//最大序列传参
+	seqmax = config.SEQNUM_MAX;
 	// 确认号
 	//初始状态下，上次发送的确认包的确认序号为7，使得当第一个接受的数据包出错时该确认报文的确认号为7
-	lastAckPkt.acknum = GBNRdtSender::SEQNUM_MAX - 1;
+	lastAckPkt.acknum = config.SEQNUM_MAX - 1;
 	// 校验和
 	lastAckPkt.checksum = 0;
 	// 序号
@@ -38,7 +39,7 @@ void GBNRdtReceiver::receive(Packet &packet) {
 		pUtils->printPacket("接收方 发送 确认报文", lastAckPkt);
 		pns->sendToNetworkLayer(SENDER, lastAckPkt);	// 确认报文的发送
 		// 通过与序号最大值取余实现序列有界
-		expectSequenceNumberRcvd = (expectSequenceNumberRcvd + 1) % GBNRdtSender::SEQNUM_MAX;
+		expectSequenceNumberRcvd = (expectSequenceNumberRcvd + 1) % seqmax;
 	}
 	else {
 		if (checkSum != packet.checksum) {

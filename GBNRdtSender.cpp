@@ -2,28 +2,28 @@
 #include "Global.h"
 #include "GBNRdtSender.h"
 
-GBNRdtSender::GBNRdtSender() {
-
-	SEQNUM_BIT = 3;
-	SEQNUM_MAX = 8;
-	WINDOW_N = 4;
+GBNRdtSender::GBNRdtSender(Configuration config) {
+	/*
+	Configuration::SEQNUM_BIT = 3;
+	Configuration::SEQNUM_MAX = 8;
+	Configuration::WINDOW_N = 4;
 
 	cout << "input bits of seqnum_max:" << endl;
-	cin >> SEQNUM_BIT;
-	SEQNUM_MAX = 1;
-	for (int i = 0; i < SEQNUM_BIT; i++)	SEQNUM_MAX *= 2;
+	cin >> Configuration::SEQNUM_BIT;
+	Configuration::SEQNUM_MAX = 1;
+	for (int i = 0; i < Configuration::SEQNUM_BIT; i++)	Configuration::SEQNUM_MAX *= 2;
 
-	cout << "sequence max: " << SEQNUM_MAX << endl;
+	cout << "sequence max: " << Configuration::SEQNUM_MAX << endl;
 	cout << "input window size" << endl;
-	cin >> WINDOW_N;
-	cout << "window size: " << WINDOW_N;
-
+	cin >> Configuration::WINDOW_N;
+	cout << "window size: " << Configuration::WINDOW_N;
+	*/
 	expectSequenceNumberSend = 0;			// 下一个发送序号 
 	waitingState = false;									// 是否处于等待Ack的状态
-	pPacketWaitingAck = new Packet[SEQNUM_MAX];
-	windowN = WINDOW_N;	// 滑动窗口大小
+	pPacketWaitingAck = new Packet[config.SEQNUM_MAX];
+	windowN = config.WINDOW_N;	// 滑动窗口大小
 	base = 0;													// 当前窗口的序号的基址，由receive函数维护 
-	rMax = SEQNUM_MAX;		// 窗口序号上界，即最大序号为rMax-1
+	rMax = config.SEQNUM_MAX;		// 窗口序号上界，即最大序号为rMax-1
 	nowlMax = windowN;	 							// 滑动窗口右边界，最大为rMax，最小为1,由receive函数维护
 }
 
