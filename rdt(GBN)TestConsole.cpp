@@ -45,6 +45,7 @@ int main(void) {
 	pns->setRtdReceiver(pr);
 	pns->setInputFile(inputFileName);
 	pns->setOutputFile(outputFileNameGBN);
+	//输出文件流重定向
 	foutGBN.open(outputWindowGBN);
 	pns->start();
 
